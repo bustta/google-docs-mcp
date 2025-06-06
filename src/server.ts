@@ -1364,26 +1364,36 @@ try {
 
 // --- Server Startup ---
 async function startServer() {
-try {
-await initializeGoogleClient(); // Authorize BEFORE starting listeners
-console.error("Starting Ultimate Google Docs MCP server...");
+  try {
+    await initializeGoogleClient(); // Authorize BEFORE starting listeners
+    console.error("Starting Ultimate Google Docs MCP server...");
 
-      // Using stdio as before
-      const configToUse = {
-          transportType: "stdio" as const,
+    const useSse = process.env.MCP_TRANSPORT === "sse" || process.argv.includes("--sse");
+    let configToUse;
+    if (useSse) {
+      const endpoint = process.env.SSE_ENDPOINT || "/sse";
+      const port = Number(process.env.SSE_PORT) || 8080;
+      configToUse = {
+        transportType: "sse" as const,
+        sse: { endpoint: endpoint as `/${string}`, port },
       };
+    } else {
+      configToUse = { transportType: "stdio" as const };
+    }
 
-      // Start the server with proper error handling
-      server.start(configToUse);
-      console.error(`MCP Server running using ${configToUse.transportType}. Awaiting client connection...`);
+    server.start(configToUse);
+    console.error(`MCP Server running using ${configToUse.transportType} transport.`);
+    if (configToUse.transportType === "stdio") {
+      console.error("Awaiting MCP client connection via stdio...");
+    } else {
+      console.error(`SSE endpoint listening on http://localhost:${configToUse.sse.port}${configToUse.sse.endpoint}`);
+    }
 
-      // Log that error handling has been enabled
-      console.error('Process-level error handling configured to prevent crashes from timeout errors.');
-
-} catch(startError: any) {
-console.error("FATAL: Server failed to start:", startError.message || startError);
-process.exit(1);
+    console.error("Process-level error handling configured to prevent crashes from timeout errors.");
+  } catch (startError: any) {
+    console.error("FATAL: Server failed to start:", startError.message || startError);
+    process.exit(1);
+  }
 }
-}
 
-startServer(); // Removed .catch here, let errors propagate if startup fails critically
+startServer();

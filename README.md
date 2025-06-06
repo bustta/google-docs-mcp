@@ -155,6 +155,21 @@ Now you need to run the server once manually to grant it permission to access yo
     - It will then finish starting and likely print "Awaiting MCP client connection via stdio..." or similar, and then exit (or you can press `Ctrl+C` to stop it).
 8.  ✅ **Check:** You should now see a new file named `token.json` in your `mcp-googledocs-server` folder.
 9.  ⚠️ **SECURITY WARNING:** This `token.json` file contains the key that allows the server to access your Google account _without_ asking again. Protect it like a password. **Do not commit it to GitHub.** The included `.gitignore` file should prevent this automatically.
+## (Optional) Run in SSE Mode
+
+If you want to connect using Server-Sent Events (e.g. for VS Code MCP extension), set the `MCP_TRANSPORT` environment variable to `sse`. You can also customize the SSE endpoint and port via `SSE_ENDPOINT` and `SSE_PORT`. For example:
+
+```bash
+# Default SSE endpoint (/sse) and port (8080)
+export MCP_TRANSPORT=sse
+node ./dist/server.js
+
+# Custom endpoint and port
+export MCP_TRANSPORT=sse
+export SSE_ENDPOINT=/mcp-sse
+export SSE_PORT=9000
+node ./dist/server.js
+```
 
 ### Step 6: Configure Claude Desktop (Optional)
 

@@ -24,7 +24,7 @@ Before setting up VS Code integration, make sure you have:
 1. Open VS Code Settings (Ctrl+, / Cmd+,)
 2. Search for "MCP" in settings
 3. Find "MCP: Servers" configuration
-4. Add a new server configuration:
+4. Add a new server configuration. To use SSE transport, add `MCP_TRANSPORT`, `SSE_ENDPOINT`, and `SSE_PORT` in `env`:
 
 ```json
 {
@@ -32,7 +32,10 @@ Before setting up VS Code integration, make sure you have:
     "command": "node",
     "args": ["${workspaceFolder}/dist/server.js"],
     "env": {
-      "NODE_ENV": "production"
+      "NODE_ENV": "production",
+      "MCP_TRANSPORT": "sse",
+      "SSE_ENDPOINT": "/sse",
+      "SSE_PORT": "8080"
     }
   }
 }
